@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="StudySession Pro — Admin panel to manage coding challenges, categories, and versions.">
+  <title>StudySession Pro — Admin Panel</title>
+
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/editor.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/tutorial.css">
+
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+
+  <div class="app-layout">
+
+    <nav class="app-sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-header-wrapper">
+          <button onclick="toggleSidebar()" class="sidebar-toggle-btn" type="button" title="Toggle Sidebar">
+            <i data-lucide="menu"></i>
+          </button>
+          <a href="index.html" id="brand-link">
+            <i data-lucide="code-2" style="color: var(--color-primary); min-width: 24px;"></i>
+            <span>StudySession</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="sidebar-menu">
+        <a href="index.html" class="sidebar-link" id="nav-home">
+          <i data-lucide="home"></i> <span class="sidebar-label">Home</span>
+        </a>
+        <a href="browse.html" class="sidebar-link" id="nav-browse">
+          <i data-lucide="layout-template"></i> <span class="sidebar-label">Coding Library</span>
+        </a>
+        <a href="study.html" class="sidebar-link" id="nav-study">
+          <i data-lucide="book-open"></i> <span class="sidebar-label">Notes Library</span>
+        </a>
+        <a href="analytics.html" class="sidebar-link" id="nav-analytics">
+          <i data-lucide="bar-chart-3"></i> <span class="sidebar-label">Analytics</span>
+        </a>
+        <a href="admin.html" class="sidebar-link active" id="nav-admin">
+          <i data-lucide="settings"></i> <span class="sidebar-label">Admin</span>
+        </a>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button onclick="toggleTheme()" class="sidebar-link" type="button">
+          <i data-lucide="moon" id="theme-icon"></i> <span class="sidebar-label">Theme</span>
+        </button>
+        <button onclick="handleDataExport()" class="sidebar-link" type="button" id="export-btn-sidebar">
+          <i data-lucide="download"></i> <span class="sidebar-label">Export Data</span>
+        </button>
+        <label class="sidebar-link" style="cursor: pointer; margin: 0;">
+          <i data-lucide="upload"></i> <span class="sidebar-label">Import Data</span>
+          <input type="file" accept=".json" class="hidden" id="import-input" onchange="handleDataImport(event)" />
+        </label>
+        <button onclick="handleDataReset()" class="sidebar-link" style="color: var(--color-danger);" type="button"
+          title="Reset All Data">
+          <i data-lucide="trash-2"></i> <span class="sidebar-label">Reset Data</span>
+        </button>
+      </div>
+    </nav>
+    <div class="messenger-layout">
+
+      <main class="messenger-pane-1">
+
+        <div class="pane-1-header">
+          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <h2
+              style="font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+              <i data-lucide="settings" style="color: var(--color-primary);"></i> Admin Panel
+            </h2>
+            <button class="tutorial-trigger-btn" onclick="GuidedTutorial.start()" title="Show Page Tour" style="margin-bottom: 1rem;">
+              <i data-lucide="graduation-cap"></i>
+            </button>
+          </div>
+          <div class="admin-toggle-group" id="admin-toggles" data-active="study" style="width: 100%;">
+            <div class="admin-toggle-slider" id="admin-toggle-slider"></div>
+            <button class="admin-toggle-btn training-mode" id="toggle-study" onclick="toggleAdminMode('study')">
+              <i data-lucide="swords"></i> Notes Mode
+            </button>
+            <button class="admin-toggle-btn practice-mode" id="toggle-practice" onclick="toggleAdminMode('practice')">
+              <i data-lucide="pen-tool"></i> Coding Mode
+            </button>
+          </div>
+          <div class="search-container" style="width: 100%; margin-bottom: 0.5rem;">
+            <i data-lucide="search"></i>
+            <input type="text" id="admin-search-input" class="search-input" placeholder="Search..." oninput="renderAdmin()">
+          </div>
+          <div id="admin-filter-container"></div>
+        </div>
+
+        <div class="pane-1-content">
+
+          <div id="admin-practice-wrapper" class="hidden">
+            <div style="display:flex; flex-direction:column; gap:0.25rem;" id="admin-table-body">
+            </div>
+
+            <div class="card-flat" style="margin-top: 2rem; padding: 1.25rem;">
+              <h2 style="font-weight:700; font-size:1.1rem; margin-bottom:1rem;">Categories</h2>
+              <ul id="admin-category-list"
+                style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem; list-style:none;"></ul>
+              <div style="display:flex; gap:0.5rem;">
+                <input id="new-category-input" placeholder="New Category"
+                  onkeydown="if(event.key==='Enter') addCategory()" class="form-input" style="flex:1;" />
+                <button onclick="addCategory()" class="btn btn-secondary btn-icon" id="add-category-btn"
+                  title="Add Category">
+                  <i data-lucide="plus" style="width:18px;height:18px;"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="card-flat" style="margin-top: 1.5rem; padding: 1.25rem;">
+              <h2 style="font-weight:700; font-size:1.1rem; margin-bottom:1rem;">Skill Tree Locks</h2>
+              <div style="display:flex; flex-direction:column; gap:0.75rem;" id="admin-lock-rules"></div>
+            </div>
+          </div>
+
+          <div id="admin-study-wrapper">
+
+            <div class="study-tabs" style="margin-bottom: 1rem;">
+              <button class="study-tab active" id="admin-subtab-notes" onclick="switchAdminStudyTab('notes', this)"
+                style="flex:1; justify-content:center;">
+                <i data-lucide="book"></i> Notes
+              </button>
+              <button class="study-tab" id="admin-subtab-snippets"
+                onclick="switchAdminStudyTab('snippets', this)" style="flex:1; justify-content:center;">
+                <i data-lucide="code"></i> Snippets
+              </button>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:0.25rem;" id="study-table-body" class="hidden">
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:0.25rem;" id="notebook-table-body">
+            </div>
+
+            <div class="card-flat hidden" style="margin-top: 2rem; padding: 1.25rem;" id="study-category-container">
+              <h2 style="font-weight:700; font-size:1.1rem; margin-bottom:1rem;">Snippet Categories</h2>
+              <ul id="study-category-list"
+                style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem; list-style:none;"></ul>
+              <div style="display:flex; gap:0.5rem;">
+                <input id="new-study-category-input" placeholder="New Category"
+                  onkeydown="if(event.key==='Enter') addStudyCategory()" class="form-input" style="flex:1;" />
+                <button onclick="addStudyCategory()" class="btn btn-secondary btn-icon" title="Add Category">
+                  <i data-lucide="plus" style="width:18px;height:18px;"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="card-flat" style="margin-top: 2rem; padding: 1.25rem;" id="notebook-category-container">
+              <h2 style="font-weight:700; font-size:1.1rem; margin-bottom:1rem;">Notebook Categories</h2>
+              <ul id="notebook-category-list"
+                style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1rem; list-style:none;"></ul>
+              <div style="display:flex; gap:0.5rem;">
+                <input id="new-notebook-category-input" placeholder="New Category"
+                  onkeydown="if(event.key==='Enter') addNotebookCategory()" class="form-input" style="flex:1;" />
+                <button onclick="addNotebookCategory()" class="btn btn-secondary btn-icon" title="Add Category">
+                  <i data-lucide="plus" style="width:18px;height:18px;"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </main>
+
+      <section class="messenger-pane-2">
+
+        <div id="admin-empty-state" style="height: 100%; display: flex; align-items: center; justify-content: center;">
+          <div style="text-align: center; color: var(--text-tertiary);">
+            <i data-lucide="edit-3" style="width: 48px; height: 48px; opacity: 0.5; margin-bottom: 1rem;"></i>
+            <h2>Select an item to edit</h2>
+            <p style="font-size: 0.875rem; margin-top: 0.5rem;">Choose a program from the left panel, or create a new
+              one.</p>
+          </div>
+          <button onclick="openNewAdminItem()" class="btn btn-primary bottom-center-action" id="new-program-btn">
+            <i data-lucide="plus" style="width:18px;height:18px;"></i> <span id="new-btn-text">Create New Program</span>
+          </button>
+        </div>
+
+        <div id="admin-form-container" class="admin-form-panel hidden">
+          <div class="admin-form-header">
+            <h2 id="admin-form-title" style="font-weight:800; font-size:1.5rem;">Edit Program</h2>
+            <button onclick="closeAdminForm()" class="btn btn-ghost" id="close-form-btn">
+              <i data-lucide="x" style="width:24px;height:24px;"></i>
+            </button>
+          </div>
+
+          <div style="display:flex; gap:1rem; margin-bottom:1rem;">
+            <div style="flex:1;">
+              <label class="form-label">Program Title</label>
+              <input id="admin-title" oninput="adminState.title = this.value" placeholder="e.g. Basic Math Operations"
+                class="form-input" style="font-weight:600;" />
+            </div>
+            <div style="width:33%;">
+              <label class="form-label">Category</label>
+              <select id="admin-category" onchange="adminState.parentId = this.value || null"
+                class="form-select"></select>
+            </div>
+          </div>
+
+          <div style="margin-bottom:1rem;">
+            <label class="form-label">Tags</label>
+            <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+              <input id="admin-tag-input" onkeydown="if(event.key==='Enter') addAdminTag()" placeholder="Add a tag..."
+                class="form-input" style="flex:1;" />
+              <button onclick="addAdminTag()" class="btn btn-secondary btn-sm">Add</button>
+            </div>
+            <div id="admin-tags-list" style="display:flex; flex-wrap:wrap; gap:0.5rem;"></div>
+          </div>
+
+          <div style="margin-bottom:1.5rem;">
+            <label class="form-label">Cover Description (Shown in Browse)</label>
+            <textarea id="admin-cover-desc" oninput="adminState.coverDescription = this.value" rows="2"
+              class="form-textarea" placeholder="Brief overview of the program..."></textarea>
+          </div>
+
+          <div class="divider"></div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <label class="form-label" style="margin-bottom:0;">Versions / Variants</label>
+            <button onclick="addAdminVariant()" class="btn btn-ghost btn-sm"
+              style="color:var(--color-primary); font-weight:600;" id="add-variant-btn">
+              <i data-lucide="plus-circle" style="width:14px;height:14px;"></i> Add Version
+            </button>
+          </div>
+
+          <div id="admin-variant-tabs" class="variant-tabs"></div>
+          <div id="admin-variant-content" style="flex:1; display:flex; flex-direction:column; gap:1rem;"></div>
+
+          <div class="admin-form-footer">
+            <button onclick="saveAdminForm()" class="btn btn-primary" id="save-all-btn">
+              <i data-lucide="save" style="width:18px;height:18px;"></i> Save All Changes
+            </button>
+          </div>
+        </div>
+
+        <div id="study-form-container" class="admin-form-panel hidden">
+          <div class="admin-form-header">
+            <h2 id="study-form-title" style="font-weight:800; font-size:1.5rem;">Edit Snippet</h2>
+            <button onclick="closeStudyForm()" class="btn btn-ghost">
+              <i data-lucide="x" style="width:24px;height:24px;"></i>
+            </button>
+          </div>
+
+          <div style="display:flex; gap:1rem; margin-bottom:1rem;">
+            <div style="flex:1;">
+              <label class="form-label">Snippet Title</label>
+              <input id="study-title" oninput="studyModeState.title = this.value" class="form-input"
+                style="font-weight:600;" />
+            </div>
+            <div style="width:33%;">
+              <label class="form-label">Category</label>
+              <select id="study-category" onchange="studyModeState.parentId = this.value || null"
+                class="form-select"></select>
+            </div>
+          </div>
+
+          <div style="margin-bottom:1rem;">
+            <label class="form-label">Tags</label>
+            <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+              <input id="study-tag-input" onkeydown="if(event.key==='Enter') addStudyTag()" placeholder="Add a tag..."
+                class="form-input" style="flex:1;" />
+              <button onclick="addStudyTag()" class="btn btn-secondary btn-sm">Add</button>
+            </div>
+            <div id="study-tags-list" style="display:flex; flex-wrap:wrap; gap:0.5rem;"></div>
+          </div>
+
+          <div style="margin-bottom:1.5rem; display:flex; flex-direction:column;">
+            <label class="form-label">Description (Rich Text)</label>
+            <div id="study-desc-editor" style="height: 150px; background: var(--bg-surface);"></div>
+          </div>
+
+          <div style="margin-bottom:1.5rem; display:flex; flex-direction:column;">
+            <label class="form-label">Comments / Notes</label>
+            <div id="study-comments-editor" style="height: 150px; background: var(--bg-surface);"></div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div style="margin-bottom:1.5rem;">
+            <label class="form-label">Linked Related Challenges</label>
+            <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+              <select id="study-challenge-select" class="form-select" style="flex:1;"></select>
+              <button onclick="addStudyRelatedChallenge()" class="btn btn-secondary btn-sm">Add Link</button>
+            </div>
+            <div id="study-related-challenges-list" style="display:flex; flex-direction:column; gap:0.5rem;"></div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div style="margin-bottom:1.5rem; display:flex; flex-direction:column; min-height:180px;">
+            <label class="form-label" style="color:var(--color-accent);">Global Starter Code (Pre-filled for Try
+              Coding)</label>
+            <div class="editor-container" style="flex:1; border-color:var(--color-accent);">
+              <pre id="study-global-starter-pre" class="editor-pre"><code id="study-global-starter-code"></code></pre>
+              <textarea id="study-global-starter-textarea" spellcheck="false" class="editor-textarea"
+                placeholder="// Add starter boilerplate here..."></textarea>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <div style="display:flex; gap:1rem; align-items:center;">
+              <label class="form-label" style="margin-bottom:0;">Code Examples</label>
+              <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8125rem;">
+                <span style="color:var(--text-tertiary); font-weight:600;">Try Coding Target(s):</span>
+                <div id="try-coding-targets-container"
+                  style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;"></div>
+              </div>
+            </div>
+            <button onclick="addStudyExample()" class="btn btn-ghost btn-sm"
+              style="color:var(--color-primary); font-weight:600;">
+              <i data-lucide="plus-circle" style="width:14px;height:14px;"></i> Add Example
+            </button>
+          </div>
+
+          <div id="study-examples-tabs" class="variant-tabs"></div>
+          <div id="study-examples-content" style="flex:1; display:flex; flex-direction:column; gap:1rem;"></div>
+
+          <div class="admin-form-footer">
+            <button onclick="saveStudyForm()" class="btn btn-primary" id="save-study-btn">
+              <i data-lucide="save" style="width:18px;height:18px;"></i> Save All Changes
+            </button>
+          </div>
+        </div>
+
+        <div id="notebook-form-container" class="admin-form-panel hidden">
+          <div class="admin-form-header">
+            <h2 id="notebook-form-title" style="font-weight:800; font-size:1.5rem;">Edit Notebook</h2>
+            <button onclick="closeNotebookForm()" class="btn btn-ghost">
+              <i data-lucide="x" style="width:24px;height:24px;"></i>
+            </button>
+          </div>
+
+          <div style="display:flex; gap:1rem; margin-bottom:1rem;">
+            <div style="flex:1;">
+              <label class="form-label">Notebook Title</label>
+              <input id="notebook-title" oninput="notebookAdminState.title = this.value" class="form-input"
+                style="font-weight:600;" placeholder="e.g. Calculus Quiz 1" />
+            </div>
+            <div style="width:33%;">
+              <label class="form-label">Category</label>
+              <select id="notebook-category" onchange="notebookAdminState.parentId = this.value || null"
+                class="form-select"></select>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:1rem; margin-bottom:1rem;">
+            <div style="width:33%;">
+              <label class="form-label">Icon (Lucide)</label>
+              <div id="notebook-icon-picker-container"></div>
+            </div>
+            <div style="flex:1;">
+              <label class="form-label">Tags</label>
+              <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+                <input id="notebook-tag-input" onkeydown="if(event.key==='Enter') addNotebookTag()"
+                  placeholder="Add a tag..." class="form-input" style="flex:1;" />
+                <button onclick="addNotebookTag()" class="btn btn-secondary btn-sm">Add</button>
+              </div>
+              <div id="notebook-tags-list" style="display:flex; flex-wrap:wrap; gap:0.5rem;"></div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:1.5rem;">
+            <label class="form-label">Description</label>
+            <textarea id="notebook-desc" oninput="notebookAdminState.description = this.value" rows="3"
+              class="form-textarea" placeholder="Brief overview of the notebook..."></textarea>
+          </div>
+
+          <div class="divider"></div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <label class="form-label" style="margin-bottom:0;">Sections (MCQ Parts)</label>
+            <button onclick="addNotebookSection()" class="btn btn-ghost btn-sm"
+              style="color:var(--color-primary); font-weight:600;">
+              <i data-lucide="plus-circle" style="width:14px;height:14px;"></i> Add Section
+            </button>
+          </div>
+
+          <div id="notebook-sections-content" style="display:flex; flex-direction:column; gap:1rem;"></div>
+
+          <div class="admin-form-footer">
+            <button onclick="saveNotebookForm()" class="btn btn-primary" id="save-notebook-btn">
+              <i data-lucide="save" style="width:18px;height:18px;"></i> Save All Changes
+            </button>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </div>
+
+  <div id="dialog-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div id="dialog-icon" class="modal-icon"></div>
+      <h2 id="dialog-title" class="modal-title"></h2>
+      <p id="dialog-msg" class="modal-desc"></p>
+      <div id="dialog-actions" class="modal-actions"></div>
+    </div>
+  </div>
+
+  <div id="answer-key-modal" class="modal-overlay hidden"
+    style="backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); background-color: rgba(0, 0, 0, 0.4);">
+    <div class="modal-content"
+      style="max-width: 1200px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 class="modal-title" style="margin: 0;">Modify Answer Key</h2>
+        <button onclick="closeAnswerKeyModal()" class="btn btn-ghost" style="padding: 0.25rem;">
+          <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+        </button>
+      </div>
+
+      <div style="flex: 1; overflow-y: auto; margin-bottom: 1rem; padding-right: 0.5rem;" id="answer-key-content">
+        <!-- Content will be injected here -->
+      </div>
+
+      <div class="modal-actions" style="margin-top: 0; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+        <button onclick="closeAnswerKeyModal()" class="btn btn-secondary">Cancel</button>
+        <button onclick="bulkAddAnswers()" class="btn btn-secondary"
+          style="border-color: var(--color-primary); color: var(--color-primary);"><i data-lucide="layers"
+            style="width:16px;height:16px;margin-right:0.5rem;"></i>Parse and apply bulk add</button>
+        <button onclick="saveAnswerKeyModal()" class="btn btn-primary">Save Answer Key</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="given-question-modal" class="modal-overlay hidden"
+    style="backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); background-color: rgba(0, 0, 0, 0.4);">
+    <div class="modal-content"
+      style="max-width: 1200px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 class="modal-title" style="margin: 0;">Modify Given Question</h2>
+        <button onclick="closeGivenQuestionModal()" class="btn btn-ghost" style="padding: 0.25rem;">
+          <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+        </button>
+      </div>
+
+      <div style="flex: 1; overflow-y: auto; margin-bottom: 1rem; padding-right: 0.5rem;" id="given-question-content">
+        <!-- Content will be injected here -->
+      </div>
+
+      <div class="modal-actions" style="margin-top: 0; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+        <button onclick="closeGivenQuestionModal()" class="btn btn-secondary">Cancel</button>
+        <button onclick="bulkAddGivenQuestions()" class="btn btn-secondary"
+          style="border-color: var(--color-primary); color: var(--color-primary);"><i data-lucide="layers"
+            style="width:16px;height:16px;margin-right:0.5rem;"></i>Parse and apply bulk add</button>
+        <button onclick="saveGivenQuestionModal()" class="btn btn-primary">Save Given Questions</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/syntax.js"></script>
+  <script src="js/diff.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/dialogs.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/icon-picker.js"></script>
+  <script src="js/admin-core.js"></script>
+  <script src="js/admin-practice.js"></script>
+  <script src="js/admin-training.js"></script>
+  <script src="js/io.js"></script>
+  <script src="js/tutorial.js"></script>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      loadData();
+      renderAdmin();
+      lucide.createIcons();
+      GuidedTutorial.init('admin');
+    });
+    (function () {
+      // 1. Init Theme
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+
+      // 2. PREVENT SIDEBAR JUMP: Apply expanded state before page renders
+      if (localStorage.getItem('sidebarExpanded') === 'true') {
+        document.documentElement.setAttribute('data-sidebar', 'expanded');
+      }
+    })();
+  </script>
+</body>
+
+</html>

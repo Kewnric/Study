@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    (function () {
+      // BUG-20/24 FIXED: Consolidated UI rendering state logic here to prevent duplicate executions
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+
+      if (localStorage.getItem('sidebarExpanded') === 'true') {
+        document.documentElement.setAttribute('data-sidebar', 'expanded');
+      }
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="StudySession Pro — Track your progress, view history, and review analytics.">
+  <title>StudySession Pro — Analytics</title>
+
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/editor.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/tutorial.css">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+  <div class="app-layout">
+
+    <nav class="app-sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-header-wrapper">
+          <button onclick="toggleSidebar()" class="sidebar-toggle-btn" type="button" title="Toggle Sidebar">
+            <i data-lucide="menu"></i>
+          </button>
+          <a href="index.html" id="brand-link">
+            <i data-lucide="code-2" style="color: var(--color-primary); min-width: 24px;"></i>
+            <span>StudySession</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="sidebar-menu">
+        <a href="index.html" class="sidebar-link" id="nav-home">
+          <i data-lucide="home"></i> <span class="sidebar-label">Home</span>
+        </a>
+        <a href="browse.html" class="sidebar-link" id="nav-browse">
+          <i data-lucide="layout-template"></i> <span class="sidebar-label">Coding Library</span>
+        </a>
+        <a href="study.html" class="sidebar-link" id="nav-study">
+          <i data-lucide="book-open"></i> <span class="sidebar-label">Notes Library</span>
+        </a>
+        <a href="analytics.html" class="sidebar-link active" id="nav-analytics">
+          <i data-lucide="bar-chart-3"></i> <span class="sidebar-label">Analytics</span>
+        </a>
+        <a href="admin.html" class="sidebar-link" id="nav-admin">
+          <i data-lucide="settings"></i> <span class="sidebar-label">Admin</span>
+        </a>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button onclick="toggleTheme()" class="sidebar-link" type="button">
+          <i data-lucide="moon" id="theme-icon"></i> <span class="sidebar-label">Theme</span>
+        </button>
+        <button onclick="handleDataExport()" class="sidebar-link" type="button" id="export-btn-sidebar">
+          <i data-lucide="download"></i> <span class="sidebar-label">Export Data</span>
+        </button>
+        <label class="sidebar-link" style="cursor: pointer; margin: 0;">
+          <i data-lucide="upload"></i> <span class="sidebar-label">Import Data</span>
+          <input type="file" accept=".json" class="hidden" id="import-input" onchange="handleDataImport(event)" />
+        </label>
+        <button onclick="handleDataReset()" class="sidebar-link" style="color: var(--color-danger);" type="button"
+          title="Reset All Data">
+          <i data-lucide="trash-2"></i> <span class="sidebar-label">Reset Data</span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="messenger-layout">
+
+      <main class="messenger-pane-1">
+        <div class="pane-1-header">
+          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <h2 style="font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+              <i data-lucide="bar-chart-3" style="color: var(--color-primary);"></i> Analytics
+            </h2>
+            <button class="tutorial-trigger-btn" onclick="GuidedTutorial.start()" title="Show Page Tour">
+              <i data-lucide="graduation-cap"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="admin-toggle-group" id="analytics-toggles" data-active="training" style="width: calc(100% - 2rem); margin: 1rem;">
+          <div class="admin-toggle-slider" id="analytics-toggle-slider"></div>
+          <button class="admin-toggle-btn training-mode" id="toggle-training"
+            onclick="switchAnalyticsTab('training')">
+            <i data-lucide="swords"></i> Notes Mode
+          </button>
+          <button class="admin-toggle-btn practice-mode" id="toggle-practice"
+            onclick="switchAnalyticsTab('practice')">
+            <i data-lucide="pen-tool"></i> Coding Mode
+          </button>
+        </div>
+
+        <div class="pane-1-content" id="analytics-sidebar-content">
+        </div>
+      </main>
+
+      <section class="messenger-pane-2">
+        <div id="analytics-detail-container" style="height: 100%;">
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+
+  <div id="timer-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-icon">
+        <i data-lucide="settings-2" style="width:48px;height:48px;color:var(--color-primary);"></i>
+      </div>
+      <h2 class="modal-title">Session Setup</h2>
+      <p class="modal-desc" style="font-size:0.875rem;">Select a version and set an optional time limit.</p>
+
+      <div style="text-align:left; margin-bottom:1.5rem;">
+        <label class="form-label">Select Version</label>
+        <select id="timer-variant-select" class="form-select" style="font-weight:600;"></select>
+      </div>
+
+      <div style="display:flex; gap:0.5rem; margin-bottom:1.5rem; text-align:left;">
+        <div style="flex:1;">
+          <label class="form-label" style="text-align:center;">Hours</label>
+          <input type="number" id="timer-h" min="0" value="0" class="form-input" style="text-align:center;" />
+        </div>
+        <div style="flex:1;">
+          <label class="form-label" style="text-align:center;">Mins</label>
+          <input type="number" id="timer-m" min="0" value="0" class="form-input" style="text-align:center;" />
+        </div>
+        <div style="flex:1;">
+          <label class="form-label" style="text-align:center;">Secs</label>
+          <input type="number" id="timer-s" min="0" value="0" class="form-input" style="text-align:center;" />
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button onclick="closeTimerModal()" class="btn btn-secondary">Cancel</button>
+        <button onclick="confirmStartPractice()" class="btn btn-primary">
+          <i data-lucide="play" style="width:16px;height:16px;fill:currentColor;"></i> Start
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="dialog-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div id="dialog-icon" class="modal-icon"></div>
+      <h2 id="dialog-title" class="modal-title"></h2>
+      <p id="dialog-msg" class="modal-desc"></p>
+      <div id="dialog-actions" class="modal-actions"></div>
+    </div>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/syntax.js"></script>
+  <script src="js/diff.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/dialogs.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/browse.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/io.js"></script>
+  <script src="js/tutorial.js"></script>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      loadData();
+
+      // Initialize right pane empty state explicitly via JS 
+      const container = document.getElementById('analytics-detail-container');
+      if (container) {
+        container.innerHTML = `
+          <div class="empty-state" style="height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+            <i data-lucide="bar-chart-3" style="width: 48px; height: 48px; opacity: 0.5; margin-bottom: 1rem;"></i>
+            <h2>Select an item</h2>
+            <p style="font-size: 0.875rem; color: var(--text-tertiary); margin-top: 0.5rem;">Choose an item from the left pane to view its practice history.</p>
+          </div>
+        `;
+      }
+
+      renderHistory();
+      lucide.createIcons();
+      GuidedTutorial.init('analytics');
+    });
+  </script>
+</body>
+
+</html>

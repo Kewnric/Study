@@ -1,0 +1,1025 @@
+/* ============================================================
+   LAYOUT.CSS — Sidebar Navigation, Messenger Panes, and Pages
+   ============================================================ */
+
+/* --- App Shell (Full Screen Wrapper) --- */
+.app-layout {
+  display: flex;
+  flex-direction: row; 
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--bg-body); /* Dark background shows through the gaps */
+}
+
+/* ============================================================
+   1. COLLAPSIBLE SIDEBAR (Instagram/Messenger Style)
+   ============================================================ */
+.app-sidebar {
+  width: 72px;
+  min-width: 72px;
+  background: var(--bg-nav-solid); 
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 100;
+  overflow: hidden;
+}
+
+/* Suppress transition on initial page load to prevent layout jump */
+.app-sidebar.no-transition {
+  transition: none !important;
+}
+
+/* Expand when toggle class is applied */
+.app-sidebar.expanded {
+  width: 260px;
+  box-shadow: var(--shadow-lg);
+}
+
+.sidebar-top {
+  padding: 1rem 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  height: 72px;
+  flex-shrink: 0;
+}
+
+.sidebar-header-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Toggle button is now strictly sized and positioned */
+.sidebar-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  min-width: 40px; 
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  margin-left: 8px; /* Centers the 40px button in the 56px padded area */
+}
+
+.sidebar-toggle-btn:hover {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--text-primary);
+}
+
+.sidebar-toggle-btn svg, .sidebar-toggle-btn i {
+  min-width: 20px;
+}
+
+/* Brand Link hidden when collapsed to prevent overlap */
+#brand-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  white-space: nowrap;
+}
+
+.app-sidebar.expanded #brand-link {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#brand-link span {
+  background: linear-gradient(135deg, #e2e8f0, #a5b4fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.sidebar-menu {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden; /* Fixes internal scrollwheels */
+  padding: 1rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sidebar-bottom {
+  padding: 1rem 0.5rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Sidebar Links */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px; 
+  height: 48px;
+  color: #94a3b8;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  text-align: left;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* FIX: Ensure SVGs don't get squished to 0px */
+.sidebar-link svg, .sidebar-link i {
+  min-width: 24px;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.sidebar-link:hover {
+  background: rgba(148, 163, 184, 0.15);
+  color: #e2e8f0;
+}
+
+.sidebar-link.active {
+  background: var(--color-primary-subtle);
+  color: #22d3ee;
+}
+
+.sidebar-label {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.app-sidebar.expanded .sidebar-label {
+  opacity: 1;
+}
+/* ============================================================
+   2. MESSENGER DUAL-PANE LAYOUT
+   ============================================================ */
+.messenger-layout {
+  display: flex;
+  flex-direction: row; 
+  flex: 1;
+  overflow: hidden;
+  background: transparent;
+  padding: 0.75rem; /* Padding creates the outer gap around both windows */
+  gap: 0.75rem; /* Gap creates the divider between Window 1 and Window 2 */
+}
+
+/* Window 1: Smaller Left Pane (40%) */
+.messenger-pane-1 {
+  width: 40%; /* Set to 40% of the available width */
+  max-width: 480px; 
+  min-width: 320px;
+  flex-shrink: 0; /* Crucial: Prevents this window from shrinking when sidebar expands */
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl); /* Floating container look */
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.pane-1-header {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: transparent;
+  z-index: 10;
+}
+
+.pane-1-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Window 2: Bigger Right Pane (60%) */
+.messenger-pane-2 {
+  flex: 1; /* Takes the remaining ~60% and absorbs all the shrinkage when sidebar expands */
+  min-width: 0; /* Allows content inside to shrink properly */
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl); /* Floating container look */
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Form Container */
+.admin-form-panel {
+  background: transparent; /* Let the pane background show */
+  padding: 2.5rem 4rem;
+  min-height: 100%;
+  animation: fadeIn 0.3s ease-out;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Bottom Center Create Button */
+.bottom-center-action {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  box-shadow: var(--shadow-xl);
+  border-radius: var(--radius-full);
+  padding: 0.875rem 2rem;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bottom-center-action:hover {
+  transform: translateX(-50%) translateY(-2px);
+}
+
+/* ============================================================
+   3. STANDARD PAGE LAYOUT (Browse, Analytics)
+   ============================================================ */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* Add gap/padding if standard pages also need the floating look */
+  padding: 0.75rem; 
+}
+
+.page-container {
+  max-width: 80rem;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-xl);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: var(--space-xl);
+  gap: var(--space-md);
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.875rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.page-title svg {
+  color: var(--color-primary);
+  width: 28px;
+  height: 28px;
+}
+
+/* --- Search Bar --- */
+.search-container {
+  position: relative;
+  width: 320px;
+}
+
+.search-container svg {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  background: var(--bg-surface-hover);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  padding: 0.625rem 1rem 0.625rem 2.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.search-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
+}
+
+.search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+
+/* ============================================================
+   4. SPECIFIC MODULE LAYOUTS 
+   ============================================================ */
+
+/* --- Practice Layout (Full Dark) --- */
+.practice-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: #0d1117;
+  color: #b1bac4;
+  height: 100%; 
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.practice-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* --- Solution/Diff Layout --- */
+.solution-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: #0d1117;
+  color: #b1bac4;
+  height: 100%;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+/* --- Legacy Study Area Layout --- */
+.study-layout {
+  display: flex;
+  height: 100%;
+  gap: var(--space-xl);
+  overflow: hidden;
+}
+
+.study-sidebar {
+  width: 320px;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  overflow-y: auto;
+}
+
+.study-main {
+  flex: 1;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  overflow-y: auto;
+}
+
+.study-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.study-tab {
+  background: none;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.study-tab:hover {
+  color: var(--text-primary);
+}
+
+.study-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.study-tab-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+
+/* ============================================================
+   5. COLLAPSIBLE FOLDERS & LIST ITEMS (Browse & Study)
+   ============================================================ */
+.snippet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.snippet-folder {
+  margin-bottom: 0.75rem;
+}
+
+.snippet-folder-summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 800;
+  color: var(--text-tertiary);
+  padding: 0.5rem 0.25rem;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-fast);
+}
+
+.snippet-folder-summary::-webkit-details-marker {
+  display: none;
+}
+
+.snippet-folder-summary:hover {
+  color: var(--text-primary);
+}
+
+details[open] > .snippet-folder-summary {
+  background: radial-gradient(circle at left, rgba(34, 211, 238, 0.15) 0%, transparent 80%), var(--bg-surface-hover) !important;
+  color: var(--text-primary) !important;
+  border-color: transparent !important;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+
+details[open] > .snippet-folder-summary::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15%;
+  bottom: 15%;
+  width: 3px;
+  background: #22d3ee;
+  box-shadow: 2px 0 8px #22d3ee;
+  border-radius: 0 4px 4px 0;
+}
+
+.folder-icon {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+details[open] > .snippet-folder-summary > .folder-icon {
+  transform: rotate(90deg);
+}
+
+.snippet-folder-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-left: 0.75rem;
+  margin-top: 0.25rem;
+  border-left: 1px solid var(--border-color);
+  margin-left: 0.5rem;
+}
+
+.snippet-list-item {
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.snippet-list-item:hover {
+  background: rgba(148, 163, 184, 0.15);
+  border-color: transparent;
+}
+
+.snippet-list-item.active {
+  background: radial-gradient(circle at left, rgba(34, 211, 238, 0.15) 0%, transparent 80%), var(--bg-nav);
+  border-color: transparent;
+}
+
+.snippet-list-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15%;
+  bottom: 15%;
+  width: 3px;
+  background: #22d3ee;
+  box-shadow: 2px 0 8px #22d3ee;
+  border-radius: 0 4px 4px 0;
+}
+
+.snippet-list-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: color var(--transition-fast);
+}
+
+.snippet-list-item.active .snippet-list-title {
+  color: #ffffff;
+  text-shadow: 0 0 6px rgba(34, 211, 238, 0.4);
+}
+
+/* ============================================================
+   5b. DEEP NESTED TREE (Folder Library)
+   ============================================================ */
+.tree-container {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.tree-node {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Depth Highlight Bars for Tree Nodes */
+.tree-node[data-level="0"] > .tree-node-row::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 10%;
+  bottom: 10%;
+  width: 3px;
+  background: var(--color-primary);
+  box-shadow: -2px 0 8px rgba(34, 211, 238, 0.4);
+  border-radius: 4px 0 0 4px;
+  opacity: 0.8;
+}
+
+.tree-node[data-level="1"] > .tree-node-row::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 15%;
+  bottom: 15%;
+  width: 3px;
+  background: var(--color-accent);
+  box-shadow: -2px 0 8px rgba(168, 85, 247, 0.4);
+  border-radius: 4px 0 0 4px;
+  opacity: 0.8;
+}
+
+.tree-node[data-level="2"] > .tree-node-row::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 3px;
+  background: var(--color-success);
+  box-shadow: -2px 0 8px rgba(34, 197, 94, 0.4);
+  border-radius: 4px 0 0 4px;
+  opacity: 0.8;
+}
+
+.tree-node[data-level="3"] > .tree-node-row::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 25%;
+  bottom: 25%;
+  width: 3px;
+  background: var(--color-warning);
+  box-shadow: -2px 0 8px rgba(245, 158, 11, 0.4);
+  border-radius: 4px 0 0 4px;
+  opacity: 0.8;
+}
+
+.tree-node[data-level="4"] > .tree-node-row::after,
+.tree-node[data-level="5"] > .tree-node-row::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 25%;
+  bottom: 25%;
+  width: 3px;
+  background: var(--color-danger);
+  box-shadow: -2px 0 8px rgba(239, 68, 68, 0.4);
+  border-radius: 4px 0 0 4px;
+  opacity: 0.8;
+}
+
+.tree-node-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* slightly increased gap for readability */
+  padding: 0.625rem 0.75rem; /* slightly more padding */
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.tree-node-row:hover {
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.tree-node-row.active {
+  background: var(--bg-surface-hover);
+  color: var(--color-primary);
+}
+
+.tree-node-row.active .tree-node-icon {
+  color: var(--color-primary);
+}
+
+.tree-node-row.active .tree-node-label {
+  color: var(--text-primary);
+}
+
+.tree-node-chevron {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  color: var(--text-tertiary);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.tree-node-chevron:hover {
+  color: var(--text-primary);
+}
+
+.tree-node-chevron.expanded {
+  transform: rotate(90deg);
+}
+
+.tree-node-chevron.invisible {
+  visibility: hidden;
+}
+
+.tree-node-icon {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  flex-shrink: 0;
+}
+
+.tree-node-icon.folder-icon-color {
+  color: var(--color-accent);
+}
+
+.tree-node-icon.item-icon-color {
+  color: var(--text-tertiary);
+}
+
+.tree-node-label {
+  font-size: 0.95rem; /* increased from 0.875rem */
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color var(--transition-fast);
+}
+
+.tree-node-badge {
+  background: var(--bg-surface-hover);
+  padding: 0.125rem 0.375rem;
+  border-radius: 1rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.tree-children {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease-out;
+  opacity: 1;
+  border-left: 1px solid var(--border-color);
+  margin-left: 1.125rem; /* Aligns with the chevron center */
+}
+
+.tree-children.collapsed {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.tree-children.collapsed .tree-children-inner {
+  transform: translateY(-10px);
+}
+
+.tree-children-inner {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(0);
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Lock indicator on tree node */
+.tree-node-lock {
+  width: 14px;
+  height: 14px;
+  color: var(--color-warning);
+  flex-shrink: 0;
+  margin-left: 0.25rem;
+}
+
+/* --- Breadcrumbs --- */
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.breadcrumb-item {
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color var(--transition-fast);
+  font-weight: 600;
+  background: none;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-sm);
+}
+
+.breadcrumb-item:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-subtle);
+}
+
+.breadcrumb-separator {
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb-separator i, .breadcrumb-separator svg {
+  width: 12px;
+  height: 12px;
+}
+
+.breadcrumb-current {
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 0.8125rem;
+}
+
+/* --- Right-Click Context Menu --- */
+.tree-context-menu {
+  position: fixed;
+  z-index: 2000;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xl);
+  padding: 0.375rem;
+  min-width: 200px;
+  animation: scaleIn 0.15s ease-out;
+}
+
+.tree-context-menu.hidden {
+  display: none;
+}
+
+.tree-context-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.tree-context-item i, .tree-context-item svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.tree-context-item:hover {
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
+}
+
+.tree-context-item.danger {
+  color: var(--text-secondary);
+}
+
+.tree-context-item.danger:hover {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.tree-context-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.25rem 0.5rem;
+}
+
+/* --- Folder Card (right pane subfolder) --- */
+.subfolder-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: var(--bg-surface-hover);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.subfolder-card:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-subtle);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.subfolder-card i, .subfolder-card svg {
+  width: 20px;
+  height: 20px;
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.subfolder-card-label {
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.subfolder-card-count {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
+
+/* ============================================================
+   6. RESPONSIVE DESIGN
+   ============================================================ */
+@media (max-width: 1024px) {
+  .messenger-pane-1 {
+    width: 35%;
+    min-width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Hide sidebar labels completely on small screens, keep just icons */
+  .app-sidebar.expanded {
+    width: 72px; 
+  }
+  .app-sidebar.expanded .sidebar-label {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .messenger-layout {
+    flex-direction: column;
+  }
+  
+  .messenger-pane-1 {
+    width: 100%;
+    min-width: 100%;
+    height: 50%; /* Stack panes on mobile */
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .messenger-pane-2 {
+    height: 50%;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-container {
+    width: 100%;
+  }
+
+  .page-container {
+    padding: var(--space-md);
+  }
+  
+  .practice-body {
+    flex-direction: column;
+  }
+
+  .practice-sidebar {
+    width: 100%;
+    min-width: 100%;
+    max-height: 40vh;
+  }
+
+  .admin-form-panel {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+/* --- Admin Form Header --- */
+.admin-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.admin-form-footer {
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+}

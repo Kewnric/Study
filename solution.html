@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="StudySession Pro — View your code submission compared to the correct solution.">
+  <title>StudySession Pro — Solution Comparison</title>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/editor.css">
+  <link rel="stylesheet" href="css/layout.css">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- ===== Solution / Diff Layout ===== -->
+  <div class="solution-layout">
+
+    <!-- Top Bar -->
+    <div class="diff-topbar">
+      <button id="solution-back-btn" class="btn-back-dark">
+        <i data-lucide="chevron-left" style="width:18px;height:18px;"></i> Back to Editor
+      </button>
+      <div class="diff-legend">
+        <span class="diff-legend-item">
+          <span class="diff-legend-dot match"></span> Match
+        </span>
+        <span class="diff-legend-item">
+          <span class="diff-legend-dot minor"></span> Minor Diff
+        </span>
+        <span class="diff-legend-item">
+          <span class="diff-legend-dot wrong"></span> Wrong/Missing
+        </span>
+      </div>
+    </div>
+
+    <!-- Diff Panels -->
+    <div class="diff-panels">
+      <div class="diff-panel">
+        <div class="diff-panel-header actual">Your Submission</div>
+        <div id="diff-actual" class="diff-panel-body"></div>
+      </div>
+      <div class="diff-panel">
+        <div class="diff-panel-header expected">Correct Solution</div>
+        <div id="diff-expected" class="diff-panel-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Scripts ===== -->
+  <script src="js/state.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/syntax.js"></script>
+  <script src="js/diff.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/solution.js"></script>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      loadData();
+      initSolution();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      document.documentElement.setAttribute('data-sidebar', 'collapsed');
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notebook Results — StudySession Pro</title>
+
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/editor.css">
+  <link rel="stylesheet" href="css/layout.css">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="practice-mode-body">
+
+  <div class="app-layout">
+    <!-- Collapsed Sidebar -->
+    <nav class="app-sidebar" style="width: var(--sidebar-collapsed-width);">
+      <div class="sidebar-top">
+        <div class="sidebar-header-wrapper" style="justify-content: center; padding-left: 0;">
+          <a href="index.html" id="brand-link" title="StudySession">
+            <i data-lucide="code-2" style="color: var(--color-primary); min-width: 24px;"></i>
+          </a>
+        </div>
+      </div>
+      <div class="sidebar-menu">
+        <a href="index.html" class="sidebar-link" title="Home">
+          <i data-lucide="home"></i>
+        </a>
+        <a href="browse.html" class="sidebar-link" title="Browse">
+          <i data-lucide="layout-template"></i>
+        </a>
+        <a href="study.html" class="sidebar-link active" title="Training Grounds">
+          <i data-lucide="book-open"></i>
+        </a>
+        <a href="analytics.html" class="sidebar-link" title="Analytics">
+          <i data-lucide="bar-chart-2"></i>
+        </a>
+        <a href="admin.html" class="sidebar-link" title="Admin">
+          <i data-lucide="settings"></i>
+        </a>
+      </div>
+      <div class="sidebar-bottom">
+        <button onclick="toggleTheme()" class="theme-toggle" id="theme-toggle-btn" title="Toggle Theme" style="justify-content: center;">
+          <i data-lucide="moon" id="theme-icon"></i>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Results Area -->
+    <div class="practice-container" style="overflow-y: auto;">
+      
+      <header class="practice-header" style="justify-content: center;">
+        <div style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary);">Notebook Results</div>
+      </header>
+
+      <div style="max-width: 800px; margin: 3rem auto; padding: 0 1rem; padding-bottom: 5rem;">
+        
+        <!-- Score Summary -->
+        <div class="card-flat" style="padding: 2rem; text-align: center; margin-bottom: 2rem; border: 2px solid var(--border-color);">
+          <h1 id="ns-notebook-title" style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem;">Notebook Title</h1>
+          <div style="color: var(--text-tertiary); font-size: 0.875rem; margin-bottom: 2rem;" id="ns-datetime">Date & Time</div>
+
+          <div style="display: flex; justify-content: center; gap: 3rem;">
+            <div>
+              <div style="font-size: 0.875rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem;">Total Score</div>
+              <div id="ns-total-score" style="font-size: 3rem; font-weight: 800; font-family: var(--font-mono); color: var(--color-primary);">0/0</div>
+            </div>
+            <div>
+              <div style="font-size: 0.875rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; margin-bottom: 0.5rem;">Accuracy</div>
+              <div id="ns-accuracy" style="font-size: 3rem; font-weight: 800; font-family: var(--font-mono); color: var(--color-success);">0%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider" style="margin-bottom: 2rem;"></div>
+
+        <!-- Sections Review -->
+        <div id="ns-sections-review">
+          <!-- Rendered by notes-solution.js -->
+        </div>
+
+        <div style="display: flex; justify-content: center; margin-top: 3rem;">
+          <button onclick="window.location.href='study.html'" class="btn btn-primary btn-lg">
+            <i data-lucide="arrow-left" style="width:20px;height:20px;"></i> Back to Training Grounds
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/notes-solution.js"></script>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+    });
+  </script>
+
+</body>
+</html>
+

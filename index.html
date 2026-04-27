@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="StudySession Pro — Your personal coding practice dashboard.">
+  <title>StudySession Pro — Dashboard</title>
+
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/tutorial.css">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+  <div class="app-layout">
+
+    <nav class="app-sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-header-wrapper">
+          <button onclick="toggleSidebar()" class="sidebar-toggle-btn" type="button" title="Toggle Sidebar">
+            <i data-lucide="menu"></i>
+          </button>
+          <a href="index.html" id="brand-link">
+            <i data-lucide="code-2" style="color: var(--color-primary); min-width: 24px;"></i>
+            <span>StudySession</span>
+          </a>
+        </div>
+      </div>
+      
+      <div class="sidebar-menu">
+        <a href="index.html" class="sidebar-link active" id="nav-home">
+          <i data-lucide="home"></i> <span class="sidebar-label">Home</span>
+        </a>
+        <a href="browse.html" class="sidebar-link" id="nav-browse">
+          <i data-lucide="layout-template"></i> <span class="sidebar-label">Coding Library</span>
+        </a>
+        <a href="study.html" class="sidebar-link" id="nav-study">
+          <i data-lucide="book-open"></i> <span class="sidebar-label">Notes Library</span>
+        </a>
+        <a href="analytics.html" class="sidebar-link" id="nav-analytics">
+          <i data-lucide="bar-chart-3"></i> <span class="sidebar-label">Analytics</span>
+        </a>
+        <a href="admin.html" class="sidebar-link" id="nav-admin">
+          <i data-lucide="settings"></i> <span class="sidebar-label">Admin</span>
+        </a>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button onclick="toggleTheme()" class="sidebar-link" type="button">
+          <i data-lucide="moon" id="theme-icon"></i> <span class="sidebar-label">Theme</span>
+        </button>
+        <button onclick="handleDataExport()" class="sidebar-link" type="button" id="export-btn-sidebar">
+          <i data-lucide="download"></i> <span class="sidebar-label">Export Data</span>
+        </button>
+        <label class="sidebar-link" style="cursor: pointer; margin: 0;">
+          <i data-lucide="upload"></i> <span class="sidebar-label">Import Data</span>
+          <input type="file" accept=".json" class="hidden" id="import-input" onchange="handleDataImport(event)" />
+        </label>
+        <button onclick="handleDataReset()" class="sidebar-link" style="color: var(--color-danger);" type="button" title="Reset All Data">
+          <i data-lucide="trash-2"></i> <span class="sidebar-label">Reset Data</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="home-content">
+      <div class="home-scroll">
+
+        <!-- Hero -->
+        <section class="home-hero fade-in-up" style="position: relative;">
+          <button class="tutorial-trigger-btn" onclick="GuidedTutorial.start()" title="Show Page Tour" style="position: absolute; top: 1rem; right: 1rem;">
+            <i data-lucide="graduation-cap"></i>
+          </button>
+          <div class="hero-greeting" id="hero-greeting"></div>
+          <div class="hero-subtitle" id="hero-subtitle"></div>
+          <div class="hero-date" id="hero-date"></div>
+          <div class="hero-verse" id="hero-verse" style="margin-top: 1rem; font-style: italic; color: var(--text-tertiary); max-width: 600px;"></div>
+        </section>
+
+        <!-- Stats -->
+        <section class="home-stats-grid stagger-children" id="home-stats"></section>
+
+        <!-- Heatmap + Carousel + Quick Actions -->
+        <section class="home-two-col">
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div class="home-card" id="home-heatmap"></div>
+            <div id="home-notebook-carousel"></div>
+          </div>
+          <div class="home-card" id="home-actions"></div>
+        </section>
+
+        <!-- SRS + Activity -->
+        <section class="home-two-col">
+          <div class="home-card" id="home-srs"></div>
+          <div class="home-card" id="home-activity"></div>
+        </section>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div id="dialog-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div id="dialog-icon" class="modal-icon"></div>
+      <h2 id="dialog-title" class="modal-title"></h2>
+      <p id="dialog-msg" class="modal-desc"></p>
+      <div id="dialog-actions" class="modal-actions"></div>
+    </div>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/dialogs.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/io.js"></script>
+  <script src="js/text-effects.js"></script>
+  <script src="js/home.js"></script>
+  <script src="js/tutorial.js"></script>
+
+  <script>
+    (function () {
+      if (localStorage.getItem('sidebarExpanded') === 'true') {
+        document.documentElement.setAttribute('data-sidebar', 'expanded');
+      }
+    })();
+    // Tutorial init — deferred to after home.js finishes rendering
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => GuidedTutorial.init('dashboard'), 100);
+    });
+  </script>
+
+</body>
+
+</html>
+

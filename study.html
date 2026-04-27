@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <script>
+    (function () {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="StudySession Pro - Training Grounds: Code Snippets and Written Study.">
+  <title>StudySession Pro — Notes Library</title>
+
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/editor.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/tutorial.css">
+
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+
+  <div class="app-layout">
+
+    <nav class="app-sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-header-wrapper">
+          <button onclick="toggleSidebar()" class="sidebar-toggle-btn" type="button" title="Toggle Sidebar">
+            <i data-lucide="menu"></i>
+          </button>
+          <a href="index.html" id="brand-link">
+            <i data-lucide="code-2" style="color: var(--color-primary); min-width: 24px;"></i>
+            <span>StudySession</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="sidebar-menu">
+        <a href="index.html" class="sidebar-link" id="nav-home">
+          <i data-lucide="home"></i> <span class="sidebar-label">Home</span>
+        </a>
+        <a href="browse.html" class="sidebar-link" id="nav-browse">
+          <i data-lucide="layout-template"></i> <span class="sidebar-label">Coding Library</span>
+        </a>
+        <a href="study.html" class="sidebar-link active" id="nav-study">
+          <i data-lucide="book-open"></i> <span class="sidebar-label">Notes Library</span>
+        </a>
+        <a href="analytics.html" class="sidebar-link" id="nav-analytics">
+          <i data-lucide="bar-chart-3"></i> <span class="sidebar-label">Analytics</span>
+        </a>
+        <a href="admin.html" class="sidebar-link" id="nav-admin">
+          <i data-lucide="settings"></i> <span class="sidebar-label">Admin</span>
+        </a>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button onclick="toggleTheme()" class="sidebar-link" type="button">
+          <i data-lucide="moon" id="theme-icon"></i> <span class="sidebar-label">Theme</span>
+        </button>
+        <button onclick="handleDataExport()" class="sidebar-link" type="button" id="export-btn-sidebar">
+          <i data-lucide="download"></i> <span class="sidebar-label">Export Data</span>
+        </button>
+        <label class="sidebar-link" style="cursor: pointer; margin: 0;">
+          <i data-lucide="upload"></i> <span class="sidebar-label">Import Data</span>
+          <input type="file" accept=".json" class="hidden" id="import-input" onchange="handleDataImport(event)" />
+        </label>
+        <button onclick="handleDataReset()" class="sidebar-link" style="color: var(--color-danger);" type="button"
+          title="Reset All Data">
+          <i data-lucide="trash-2"></i> <span class="sidebar-label">Reset Data</span>
+        </button>
+      </div>
+    </nav>
+    <div class="messenger-layout">
+
+      <main class="messenger-pane-1">
+        <div class="pane-1-header">
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+          <h2 style="font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+            <i data-lucide="book-open" style="color: var(--color-primary);"></i> Notes Library
+          </h2>
+          <button class="tutorial-trigger-btn" onclick="GuidedTutorial.start()" title="Show Page Tour">
+            <i data-lucide="graduation-cap"></i>
+          </button>
+        </div>
+          <div class="search-container" style="width: 100%;">
+            <i data-lucide="search"></i>
+            <input type="text" id="snippet-search" oninput="handleTrainingGroundsSearch()" placeholder="Search..."
+              class="search-input">
+          </div>
+
+          <div class="study-tabs" style="margin: 0; padding-top: 0.5rem; border-bottom: none;">
+            <button class="study-tab active" id="training-tab-notes" onclick="switchStudyTab('notes', this)"
+              style="flex:1; justify-content:center;">
+              <i data-lucide="book"></i> Notes
+            </button>
+            <button class="study-tab" onclick="switchStudyTab('snippets', this)"
+              style="flex:1; justify-content:center;">
+              <i data-lucide="code"></i> Snippets
+            </button>
+          </div>
+        </div>
+
+        <div class="pane-1-content" id="snippet-list-container" style="padding-top: 0;"></div>
+
+        <div class="pane-1-content hidden" id="notes-sidebar-container" style="padding-top: 0;">
+        </div>
+      </main>
+
+      <section class="messenger-pane-2">
+        <div id="snippet-detail-container" style="padding: 2rem; min-height: 100%;">
+          <div class="empty-state"
+            style="height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+            <i data-lucide="mouse-pointer-click"
+              style="width: 48px; height: 48px; opacity: 0.5; margin-bottom: 1rem;"></i>
+            <h2>Select a snippet</h2>
+            <p style="font-size: 0.875rem; color: var(--text-tertiary); margin-top: 0.5rem;">Choose a code snippet from
+              the left pane to view its details.</p>
+          </div>
+        </div>
+
+        <div id="notes-detail-container" class="hidden" style="padding: 2rem; overflow-y: auto; height: 100%;">
+          <div id="notes-sections-area"></div>
+          <div id="notes-empty-state" class="empty-state"
+            style="height:100%; display:flex; align-items:center; justify-content:center; flex-direction:column;">
+            <i data-lucide="book-open" style="width:48px;height:48px;opacity:0.5;margin-bottom:1rem;"></i>
+            <h2>Select a Notebook</h2>
+            <p style="font-size:0.875rem;color:var(--text-tertiary);margin-top:0.5rem;">Choose a notebook from the left
+              panel to begin your session.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="snippet-context-menu" class="tree-context-menu hidden">
+    <button class="tree-context-item" id="sctx-new-folder" onclick="snippetCtxNewFolder()">
+      <i data-lucide="folder-plus"></i> New Subfolder
+    </button>
+    <button class="tree-context-item" id="sctx-rename" onclick="snippetCtxRename()">
+      <i data-lucide="pencil"></i> Rename
+    </button>
+    <button class="tree-context-item" id="sctx-move" onclick="snippetCtxMove()">
+      <i data-lucide="move"></i> Move to...
+    </button>
+    <button class="tree-context-item" id="sctx-icon" onclick="snippetCtxChangeIcon()">
+      <i data-lucide="image"></i> Change Icon
+    </button>
+    <div class="tree-context-divider"></div>
+    <button class="tree-context-item danger" id="sctx-delete" onclick="snippetCtxDelete()">
+      <i data-lucide="trash-2"></i> Delete Folder
+    </button>
+  </div>
+
+  <div id="notebook-context-menu" class="tree-context-menu hidden">
+    <button class="tree-context-item" id="nctx-new-folder" onclick="notebookCtxNewFolder()">
+      <i data-lucide="folder-plus"></i> New Subfolder
+    </button>
+    <button class="tree-context-item" id="nctx-rename" onclick="notebookCtxRename()">
+      <i data-lucide="pencil"></i> Rename
+    </button>
+    <button class="tree-context-item" id="nctx-move" onclick="notebookCtxMove()">
+      <i data-lucide="move"></i> Move to...
+    </button>
+    <button class="tree-context-item" id="nctx-icon" onclick="notebookCtxChangeIcon()">
+      <i data-lucide="image"></i> Change Icon
+    </button>
+    <div class="tree-context-divider"></div>
+    <button class="tree-context-item danger" id="nctx-delete" onclick="notebookCtxDelete()">
+      <i data-lucide="trash-2"></i> Delete Folder
+    </button>
+  </div>
+
+  <div id="examples-modal" class="modal-overlay hidden">
+    <div class="modal-content modal-content-lg" style="max-width: 800px; text-align: left;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 id="examples-modal-title" class="modal-title" style="margin: 0;">Snippet Examples</h2>
+        <button onclick="closeExamplesModal()" class="btn btn-ghost"><i data-lucide="x"></i></button>
+      </div>
+      <div class="variant-tabs" id="examples-tabs"></div>
+      <div id="examples-content" style="min-height: 200px;"></div>
+    </div>
+  </div>
+
+  <div id="try-coding-modal" class="modal-overlay hidden">
+    <div class="modal-content modal-content-lg"
+      style="max-width: 900px; text-align: left; max-height: 90vh; display: flex; flex-direction: column;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 id="try-coding-title" class="modal-title" style="margin: 0;">
+          <i data-lucide="terminal"
+            style="width:24px; height:24px; display:inline; vertical-align:middle; margin-right:0.5rem;"></i> Try Coding
+        </h2>
+        <button onclick="closeTryCodingModal()" class="btn btn-ghost"><i data-lucide="x"></i></button>
+      </div>
+      <div id="try-coding-desc"
+        style="font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 1rem; padding: 0.75rem; background: var(--bg-surface-hover); border-radius: var(--radius-md); border-left: 3px solid var(--color-primary);">
+      </div>
+      <div class="editor-container" style="flex: 1; min-height: 280px; max-height: 400px;">
+        <pre id="try-coding-pre" class="editor-pre"><code id="try-coding-code"></code></pre>
+        <textarea id="try-coding-textarea" spellcheck="false" class="editor-textarea"
+          placeholder="// Type your code here..."></textarea>
+      </div>
+      <div id="try-coding-result" style="margin-top: 1rem; display: none;"></div>
+      <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+        <button onclick="resetTryCoding()" class="btn btn-secondary" style="flex: 1;">
+          <i data-lucide="rotate-ccw" style="width:16px;height:16px;"></i> Reset
+        </button>
+        <button onclick="checkTryCoding()" class="btn btn-primary" style="flex: 2;">
+          <i data-lucide="check-circle" style="width:16px;height:16px;"></i> Check Code
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="related-challenges-modal" class="modal-overlay hidden">
+    <div class="modal-content modal-content-lg"
+      style="max-width: 650px; text-align: left; max-height: 80vh; display: flex; flex-direction: column;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 class="modal-title" style="margin: 0;">
+          <i data-lucide="link"
+            style="width:24px; height:24px; display:inline; vertical-align:middle; margin-right:0.5rem;"></i> Related
+          Challenges
+        </h2>
+        <button onclick="closeRelatedChallengesModal()" class="btn btn-ghost"><i data-lucide="x"></i></button>
+      </div>
+      <div class="search-container" style="margin-bottom: 1rem;">
+        <i data-lucide="search"></i>
+        <input type="text" id="related-search" oninput="renderRelatedChallengesList()"
+          placeholder="Search challenges..." class="search-input">
+      </div>
+      <div id="related-challenges-list"
+        style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem;"></div>
+    </div>
+  </div>
+
+  <div id="dialog-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div id="dialog-icon" class="modal-icon"></div>
+      <h2 id="dialog-title" class="modal-title"></h2>
+      <p id="dialog-msg" class="modal-desc"></p>
+      <div id="dialog-actions" class="modal-actions"></div>
+    </div>
+  </div>
+
+  <div id="timer-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div class="modal-icon">
+        <i data-lucide="settings-2" style="width:48px;height:48px;color:var(--color-primary);"></i>
+      </div>
+      <h2 class="modal-title">Session Setup</h2>
+      <p class="modal-desc" style="font-size:0.875rem;">Select a version and set an optional time limit.</p>
+      <div style="text-align:left; margin-bottom:1.5rem;">
+        <label class="form-label">Select Version</label>
+        <select id="timer-variant-select" class="form-select" style="font-weight:600;"></select>
+      </div>
+      <div style="display:flex; gap:0.5rem; margin-bottom:1.5rem; text-align:left;">
+        <div style="flex:1;">
+          <label class="form-label" style="text-align:center;">Hours</label>
+          <input type="number" id="timer-h" min="0" value="0" class="form-input" style="text-align:center;" />
+        </div>
+        <div style="flex:1;">
+          <label class="form-label" style="text-align:center;">Mins</label>
+          <input type="number" id="timer-m" min="0" value="0" class="form-input" style="text-align:center;" />
+        </div>
+        <div style="flex:1;">
+          <label class="form-label" style="text-align:center;">Secs</label>
+          <input type="number" id="timer-s" min="0" value="0" class="form-input" style="text-align:center;" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button onclick="closeTimerModal()" class="btn btn-secondary">Cancel</button>
+        <button onclick="confirmStartPractice()" class="btn btn-primary">
+          <i data-lucide="play" style="width:16px;height:16px;fill:currentColor;"></i> Start
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/syntax.js"></script>
+  <script src="js/diff.js"></script>
+  <script src="js/dialogs.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/browse.js"></script>
+  <script src="js/icon-picker.js"></script>
+  <script src="js/study.js"></script>
+  <script src="js/notes.js"></script>
+  <script src="js/io.js"></script>
+  <script src="js/tutorial.js"></script>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      loadData();
+      renderStudyArea();
+      checkSharedSnippet();
+      checkSharedNotebook();
+      lucide.createIcons();
+      GuidedTutorial.init('study');
+    });
+  </script>
+</body>
+
+</html>

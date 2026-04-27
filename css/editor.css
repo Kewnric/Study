@@ -1,0 +1,464 @@
+/* ============================================================
+   EDITOR.CSS — Code Editor, Syntax Highlighting, Diff View
+   ============================================================ */
+
+/* --- Code Editor Container --- */
+.editor-container {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 250px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.7;
+  background: #0d1117;
+  border-radius: var(--radius-md);
+  border: 1px solid #21262d;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color var(--transition-fast);
+}
+
+.editor-container:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-glow);
+}
+
+.editor-pre {
+  position: absolute;
+  inset: 0;
+  padding: 1.25rem;
+  margin: 0;
+  overflow: auto;
+  pointer-events: none;
+  white-space: pre;
+  z-index: 0;
+}
+
+.editor-pre code {
+  display: block;
+  min-height: 100%;
+  font-family: var(--font-mono);
+  font-size: inherit;
+  line-height: inherit;
+  tab-size: 2;
+}
+
+.editor-textarea {
+  position: absolute;
+  inset: 0;
+  padding: 1.25rem;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  resize: none;
+  overflow: auto;
+  background: transparent;
+  color: transparent;
+  caret-color: #58a6ff;
+  outline: none;
+  border: none;
+  white-space: pre;
+  z-index: 10;
+  font-family: var(--font-mono);
+  font-size: inherit;
+  line-height: inherit;
+  tab-size: 2;
+}
+
+.editor-textarea::placeholder {
+  color: #484f58;
+}
+
+/* --- Practice Area Editor (full dark mode) --- */
+.practice-editor-area {
+  flex: 1;
+  position: relative;
+  background: #0d1117;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* --- Syntax Highlighting Colors (VS Code Dark+ Theme) --- */
+.syntax-string { color: #ce9178; }
+.syntax-comment { color: #6a9955; font-style: italic; }
+.syntax-keyword { color: #569cd6; }
+.syntax-type { color: #569cd6; }
+.syntax-control { color: #c586c0; }
+.syntax-primitive { color: #569cd6; }
+.syntax-number { color: #b5cea8; }
+.syntax-bracket { color: #ffd700; }
+.syntax-function { color: #dcdcaa; }
+.syntax-function-call { color: #dcdcaa; }
+.syntax-stdlib { color: #dcdcaa; }
+.syntax-preproc { color: #c586c0; }
+.syntax-header { color: #ce9178; }
+.syntax-operator { color: #d4d4d4; }
+
+/* --- Practice Sidebar --- */
+.practice-sidebar {
+  width: 380px;
+  min-width: 380px;
+  border-right: 1px solid #21262d;
+  background: #161b22;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.practice-sidebar h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e6edf3;
+  padding-bottom: 0.625rem;
+  border-bottom: 1px solid #21262d;
+}
+
+.practice-sidebar p {
+  color: #b1bac4;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.practice-footer {
+  margin-top: auto;
+  padding-top: 1.25rem;
+  border-top: 1px solid #21262d;
+}
+
+.practice-footer p {
+  font-size: 0.75rem;
+  color: #484f58;
+}
+
+/* --- Sample Display (inside practice sidebar) --- */
+.sample-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.375rem;
+}
+
+.sample-content {
+  background: #0d1117;
+  padding: 0.875rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #21262d;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: #b1bac4;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+/* Colored text inside samples */
+.sample-content .sample-label {
+  color: #ffa657;
+}
+
+/* --- Practice Top Bar --- */
+.practice-topbar {
+  background: #161b22;
+  border-bottom: 1px solid #21262d;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.practice-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.practice-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.practice-title-badge {
+  font-weight: 600;
+  color: #e6edf3;
+  padding: 0.375rem 0.75rem;
+  background: #0d1117;
+  border-radius: var(--radius-md);
+  border: 1px solid #21262d;
+  font-size: 0.875rem;
+}
+
+.timer-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #0d1117;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid #21262d;
+}
+
+.timer-display svg {
+  color: var(--color-primary);
+  width: 16px;
+  height: 16px;
+}
+
+.timer-display span {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #e6edf3;
+  letter-spacing: 0.05em;
+}
+
+.timer-expired {
+  color: var(--color-danger) !important;
+}
+
+.btn-back-dark {
+  color: #8b949e;
+  background: none;
+  border: none;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  transition: color var(--transition-fast);
+}
+
+.btn-back-dark:hover {
+  color: #e6edf3;
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.btn-submit:hover {
+  box-shadow: 0 4px 16px var(--color-primary-glow);
+  transform: translateY(-1px);
+}
+
+/* --- Diff / Solution View --- */
+.diff-topbar {
+  background: #161b22;
+  border-bottom: 1px solid #21262d;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.diff-legend {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.diff-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.diff-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.diff-legend-dot.match { background: var(--color-success); }
+.diff-legend-dot.minor { background: var(--color-warning); }
+.diff-legend-dot.wrong { background: var(--color-danger); }
+
+.diff-panels {
+  display: flex;
+  flex: 1;
+  overflow: auto;
+  padding: 1.5rem;
+  gap: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  background: #0d1117;
+}
+
+.diff-panel {
+  flex: 1;
+  background: #161b22;
+  border-radius: var(--radius-md);
+  border: 1px solid #21262d;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.diff-panel-header {
+  background: #1c2333;
+  padding: 0.625rem 1rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  border-bottom: 1px solid #21262d;
+}
+
+.diff-panel-header.actual { color: #b1bac4; }
+.diff-panel-header.expected { color: var(--color-success); }
+
+.diff-panel-body {
+  overflow: auto;
+  flex: 1;
+  padding: 0.25rem;
+}
+
+.diff-line {
+  display: flex;
+  padding: 0.125rem 0.625rem;
+  min-height: 1.5rem;
+}
+
+.diff-line-number {
+  width: 2rem;
+  color: #484f58;
+  user-select: none;
+  text-align: right;
+  padding-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.diff-line-content {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Diff line statuses */
+.diff-line.perfect {
+  background: rgba(16, 185, 129, 0.08);
+  border-left: 3px solid var(--color-success);
+}
+
+.diff-line.partial {
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 3px solid var(--color-warning);
+}
+
+.diff-line.wrong,
+.diff-line.missing,
+.diff-line.extra {
+  background: rgba(239, 68, 68, 0.08);
+  border-left: 3px solid var(--color-danger);
+}
+
+.diff-line.expected-highlight {
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.diff-line.extra-expected {
+  background: rgba(99, 102, 241, 0.03);
+}
+
+/* --- Character-Level Diff Highlighting --- */
+.diff-char-match {
+  color: #3fb950;
+  background: rgba(63, 185, 80, 0.12);
+  border-radius: 2px;
+}
+
+.diff-char-offset {
+  color: #d29922;
+  background: rgba(210, 153, 34, 0.15);
+  border-radius: 2px;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+}
+
+.diff-char-wrong {
+  color: #f85149;
+  background: rgba(248, 81, 73, 0.15);
+  border-radius: 2px;
+}
+
+.diff-char-missing {
+  color: #f85149;
+  background: rgba(248, 81, 73, 0.1);
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-decoration-color: #f85149;
+  text-underline-offset: 3px;
+  border-radius: 2px;
+}
+
+.diff-char-neutral {
+  color: #8b949e;
+}
+
+.diff-char-placeholder {
+  font-style: italic;
+  color: #484f58;
+  font-size: 0.75rem;
+}
+
+/* --- Example Code View (Training Grounds snippet viewer) --- */
+.example-line {
+  display: block;
+  line-height: 1.7;
+  padding: 0 0;
+}
+
+.example-line-highlight {
+  background: rgba(99, 102, 241, 0.12);
+  border-left: 3px solid var(--color-primary);
+  padding-left: 0.25rem;
+  margin-left: -0.25rem;
+  animation: pulseHighlight 2.5s infinite ease-in-out;
+}
+
+/* --- MiSide Character Reveal Animation --- */
+.miside-char-hidden {
+  opacity: 0;
+  filter: blur(4px);
+  display: inline;
+}
+
+.miside-char-reveal {
+  opacity: 1;
+  filter: blur(0);
+  display: inline;
+  animation: misideReveal 0.15s ease-out forwards;
+}
+
+@keyframes misideReveal {
+  0% {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
